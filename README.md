@@ -18,7 +18,7 @@ npx cc-agent-load
   ▸ Your Time vs AI Time
 
   You   ████████░░░░░░░░░░░░░░░░  41h (34%)  86 sessions
-  AI    ████████████████░░░░░░░░  79h (66%)  3420 sessions
+  AI    ████████████████░░░░░░░░  80h (66%)  3423 sessions
 
   ▸ AI Autonomy Ratio
   ████████ 1.9x  — AI ran 1.9x longer than you
@@ -26,8 +26,17 @@ npx cc-agent-load
   Your AI matches your pace.
 
   ▸ Top Projects (AI load)
-  ~                     █████████░░░  90.6h total
-  cc-loop               ███░░░░░░░░░  25.4h total
+  ~                     █████████░░░  90.7h total
+  cc-loop               ███░░░░░░░░░  26.5h total
+
+  ▸ Ghost Days  (AI worked, you didn't)
+
+  39 days  AI ran without you  —  52.4h total
+  Longest: 2026-02-09 (6.0h)
+    2026-02-09  6.0h
+    2026-01-30  5.7h
+    2026-02-16  5.0h
+    ... and 36 more
 
   ── Share ──
   My Claude Code AI load: 66% subagent / 34% me — 1.9x autonomy ratio
@@ -43,8 +52,13 @@ When you run `cc-session-stats`, the session count includes every subagent spawn
 | **Your time** | Sessions where you were at the keyboard |
 | **AI time** | Autonomous subagent sessions (Task tool spawns) |
 | **Autonomy ratio** | How much longer AI ran vs. you |
+| **Ghost Days** | Days where AI ran but you had zero sessions |
 
 An autonomy ratio of `2.0x` means your AI worked twice as long as you did.
+
+**Ghost Days** are the most striking metric: days where you never opened Claude Code, but your autonomous pipelines kept running anyway. Some users find the AI worked 5–6 hours on days they were completely offline.
+
+The browser version also includes an **Activity Calendar** — a GitHub-style heatmap showing your activity vs. AI activity day by day. Ghost Days appear as purple.
 
 ## How it works
 
