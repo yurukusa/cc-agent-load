@@ -262,6 +262,11 @@ if (ghostDaysList.length > 0) {
 }
 
 console.log();
+console.log(`  ${C.dim}── Activity Calendar ──${C.reset}`);
+console.log(`  ${C.dim}GitHub-style heatmap: your sessions vs AI sessions, day by day${C.reset}`);
+console.log(`  ${C.dim}Ghost Days shown in purple.${C.reset}`);
+console.log(`  ${C.cyan}  https://yurukusa.github.io/cc-agent-load/${C.reset}`);
+console.log();
 console.log(`  ${C.dim}── Share ──${C.reset}`);
 console.log(`  ${C.dim}My Claude Code AI load: ${Math.round(subPct * 100)}% subagent / ${Math.round(mainPct * 100)}% me — ${autonomyRatio.toFixed(1)}x autonomy ratio${C.reset}`);
 console.log(`  ${C.dim}npx cc-agent-load  #ClaudeCode #AIAutonomy${C.reset}`);

@@ -58,7 +58,9 @@ An autonomy ratio of `2.0x` means your AI worked twice as long as you did.
 
 **Ghost Days** are the most striking metric: days where you never opened Claude Code, but your autonomous pipelines kept running anyway. Some users find the AI worked 5–6 hours on days they were completely offline.
 
-The browser version also includes an **Activity Calendar** — a GitHub-style heatmap showing your activity vs. AI activity day by day. Ghost Days appear as purple.
+The browser version also includes an **Activity Calendar** — a GitHub-style heatmap showing your activity vs. AI activity day by day. Ghost Days (AI-only days) appear in purple; your sessions in blue; overlapping days in yellow.
+
+Open [yurukusa.github.io/cc-agent-load](https://yurukusa.github.io/cc-agent-load/), select your `~/.claude` folder, and the calendar renders instantly. No install needed.
 
 ## How it works
 
