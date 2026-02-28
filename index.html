@@ -113,6 +113,21 @@
       <div id="projectsChart"></div>
     </div>
 
+    <div class="section" id="ghostSection" style="display:none; border-color: var(--purple);">
+      <h3 style="color: var(--purple);">Ghost Days — AI worked, you didn't</h3>
+      <div style="display:flex; gap:24px; margin-bottom:12px;">
+        <div>
+          <div style="font-size:2rem; font-weight:700; color:var(--purple);" id="ghostDaysVal"></div>
+          <div style="font-size:0.75rem; color:var(--muted);">Days AI ran alone</div>
+        </div>
+        <div>
+          <div style="font-size:2rem; font-weight:700; color:var(--yellow);" id="ghostHoursVal"></div>
+          <div style="font-size:0.75rem; color:var(--muted);">Total AI-only hours</div>
+        </div>
+      </div>
+      <div id="ghostLongest" style="font-size:0.85rem; color:var(--muted);"></div>
+    </div>
+
     <div class="share-box">
       <h3>Share your AI autonomy ratio</h3>
       <a id="shareLink" class="share-btn" target="_blank" href="#">Post on X (Twitter)</a>
@@ -208,7 +223,19 @@ function visualize() {
     });
   }
 
-  const shareText = `My Claude Code AI load:\n${data.mainPct}% me / ${data.subPct}% AI — ${data.autonomyRatio.toFixed(1)}x autonomy ratio\nCheck yours: https://yurukusa.github.io/cc-agent-load/\nnpx cc-agent-load\n#ClaudeCode`;
+  // Ghost Days
+  if (data.ghostDays && data.ghostDays > 0) {
+    document.getElementById('ghostSection').style.display = 'block';
+    document.getElementById('ghostDaysVal').textContent = data.ghostDays;
+    document.getElementById('ghostHoursVal').textContent = (data.ghostHours || 0).toFixed(1) + 'h';
+    const longest = data.longestGhostDay;
+    if (longest) {
+      document.getElementById('ghostLongest').textContent = `Longest: ${longest.date} — ${longest.hours.toFixed(1)}h of AI-only work`;
+    }
+  }
+
+  const ghostNote = data.ghostDays ? ` — ${data.ghostDays} Ghost Days` : '';
+  const shareText = `My Claude Code AI load:\n${data.mainPct}% me / ${data.subPct}% AI — ${data.autonomyRatio.toFixed(1)}x autonomy ratio${ghostNote}\nCheck yours: https://yurukusa.github.io/cc-agent-load/\nnpx cc-agent-load\n#ClaudeCode`;
   document.getElementById('shareLink').href = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   document.getElementById('result').style.display = 'block';
