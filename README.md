@@ -2,6 +2,8 @@
 
 See how much of your Claude Code time is **you** vs **AI autonomous subagents**.
 
+**Try it in your browser:** [yurukusa.github.io/cc-agent-load](https://yurukusa.github.io/cc-agent-load/)
+
 ```
 npx cc-agent-load
 ```
