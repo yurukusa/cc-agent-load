@@ -60,6 +60,13 @@
     .legend span { display: flex; align-items: center; gap: 4px; }
     .dot-you { width: 10px; height: 10px; background: var(--cyan); border-radius: 2px; }
     .dot-ai { width: 10px; height: 10px; background: var(--yellow); border-radius: 2px; }
+    .calendar-wrap { overflow-x: auto; padding-bottom: 4px; }
+    .cal-row { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; }
+    .cal-label { font-size: 0.7rem; color: var(--muted); width: 24px; text-align: right; flex-shrink: 0; }
+    .cal-cells { display: flex; gap: 2px; }
+    .cal-cell { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; cursor: default; position: relative; }
+    .cal-cell:hover::after { content: attr(data-tip); position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); background: #1c2128; border: 1px solid var(--border); color: var(--text); font-size: 0.7rem; padding: 3px 6px; border-radius: 4px; white-space: nowrap; z-index: 10; pointer-events: none; }
+    .cal-month-labels { display: flex; gap: 2px; margin-left: 28px; margin-bottom: 2px; font-size: 0.65rem; color: var(--muted); }
   </style>
 </head>
 <body>
@@ -113,6 +120,21 @@
       <div id="projectsChart"></div>
     </div>
 
+    <div class="section" id="calendarSection" style="display:none;">
+      <h3>Activity Calendar — You vs AI</h3>
+      <div class="legend" style="margin-bottom:8px;">
+        <span><div class="dot-you"></div> You</span>
+        <span><div class="dot-ai"></div> AI only</span>
+        <span><div style="width:10px;height:10px;background:#6e40c9;border-radius:2px;"></div> Ghost Day</span>
+        <span><div style="width:10px;height:10px;background:#3a3a3a;border-radius:2px;"></div> Inactive</span>
+      </div>
+      <div class="calendar-wrap">
+        <div class="cal-month-labels" id="calMonthLabels"></div>
+        <div class="cal-row"><span class="cal-label">You</span><div class="cal-cells" id="calYouCells"></div></div>
+        <div class="cal-row"><span class="cal-label">AI</span><div class="cal-cells" id="calAiCells"></div></div>
+      </div>
+    </div>
+
     <div class="section" id="ghostSection" style="display:none; border-color: var(--purple);">
       <h3 style="color: var(--purple);">Ghost Days — AI worked, you didn't</h3>
       <div style="display:flex; gap:24px; margin-bottom:12px;">
@@ -158,6 +180,97 @@
 </div>
 
 <script>
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function buildCalendar(byDate) {
+  const dates = Object.keys(byDate).sort();
+  if (dates.length === 0) return;
+
+  // Find date range: last 26 weeks (182 days) ending today or last date
+  const lastDate = new Date(dates[dates.length - 1]);
+  const firstDate = new Date(lastDate);
+  firstDate.setDate(firstDate.getDate() - 181);
+
+  // Build week columns (Sun to Sat)
+  const startSun = new Date(firstDate);
+  startSun.setDate(startSun.getDate() - startSun.getDay()); // go back to Sunday
+
+  const weeks = [];
+  let cur = new Date(startSun);
+  while (cur <= lastDate) {
+    const week = [];
+    for (let d = 0; d < 7; d++) {
+      week.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    weeks.push(week);
+  }
+
+  // Max hours for color scaling
+  let maxMain = 0, maxSub = 0;
+  for (const v of Object.values(byDate)) {
+    if (v.main > maxMain) maxMain = v.main;
+    if (v.sub > maxSub) maxSub = v.sub;
+  }
+  if (maxMain === 0) maxMain = 1;
+  if (maxSub === 0) maxSub = 1;
+
+  function intensityColor(hours, maxH, isAI, isGhost) {
+    if (isGhost) {
+      // Purple for ghost days (AI only)
+      const t = Math.min(hours / maxH, 1);
+      const a = 0.3 + t * 0.7;
+      return `rgba(110, 64, 201, ${a})`;
+    }
+    if (hours === 0) return '#1c2128';
+    const t = Math.min(hours / maxH, 1);
+    const a = 0.25 + t * 0.75;
+    return isAI ? `rgba(247, 201, 72, ${a})` : `rgba(88, 216, 240, ${a})`;
+  }
+
+  // Month labels
+  const monthLabels = document.getElementById('calMonthLabels');
+  monthLabels.innerHTML = '';
+  let lastMonth = -1;
+  weeks.forEach(week => {
+    const m = week[0].getMonth();
+    const span = document.createElement('span');
+    span.style.width = '13px';
+    span.style.display = 'inline-block';
+    if (m !== lastMonth) {
+      span.textContent = MONTHS[m];
+      lastMonth = m;
+    }
+    monthLabels.appendChild(span);
+  });
+
+  // Render rows
+  ['calYouCells', 'calAiCells'].forEach((id, rowIdx) => {
+    const isAI = rowIdx === 1;
+    const container = document.getElementById(id);
+    container.innerHTML = '';
+    weeks.forEach(week => {
+      const col = document.createElement('div');
+      col.style.display = 'flex';
+      col.style.flexDirection = 'column';
+      col.style.gap = '2px';
+      week.forEach(date => {
+        const key = date.toLocaleDateString('en-CA');
+        const entry = byDate[key] || { main: 0, sub: 0 };
+        const hours = isAI ? entry.sub : entry.main;
+        const isGhost = isAI && entry.main === 0 && entry.sub > 0;
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell';
+        cell.style.background = intensityColor(hours, isAI ? maxSub : maxMain, isAI, isGhost);
+        const label = isAI ? (isGhost ? `Ghost: ${key} AI ${entry.sub.toFixed(1)}h` : `${key} AI ${entry.sub.toFixed(1)}h`) : `${key} You ${entry.main.toFixed(1)}h`;
+        cell.setAttribute('data-tip', label);
+        col.appendChild(cell);
+      });
+      container.appendChild(col);
+    });
+  });
+}
+
 function visualize() {
   const raw = document.getElementById('jsonInput').value.trim();
   const errEl = document.getElementById('errorMsg');
@@ -221,6 +334,12 @@ function visualize() {
       `;
       chart.appendChild(row);
     });
+  }
+
+  // Activity Calendar
+  if (data.byDate && Object.keys(data.byDate).length > 0) {
+    document.getElementById('calendarSection').style.display = 'block';
+    buildCalendar(data.byDate);
   }
 
   // Ghost Days

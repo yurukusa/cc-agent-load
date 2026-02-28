@@ -173,9 +173,18 @@ const topProjects = Object.entries(allProjects)
   .sort((a, b) => b.total - a.total)
   .slice(0, 6);
 
+// Merged byDate for calendar view
+const calendarData = {};
+for (const date of allDates) {
+  calendarData[date] = {
+    main: Math.round((main.byDate[date] || 0) * 100) / 100,
+    sub: Math.round((sub.byDate[date] || 0) * 100) / 100,
+  };
+}
+
 if (jsonMode) {
   console.log(JSON.stringify({
-    version: '1.1',
+    version: '1.2',
     totalHours: total,
     mainHours: main.hours,
     subagentHours: sub.hours,
@@ -188,6 +197,7 @@ if (jsonMode) {
     ghostDays: ghostDaysList.length,
     ghostHours: Math.round(ghostHours * 10) / 10,
     longestGhostDay: longestGhostDay ? { date: longestGhostDay.date, hours: Math.round(longestGhostDay.hours * 10) / 10 } : null,
+    byDate: calendarData,
   }, null, 2));
   process.exit(0);
 }
