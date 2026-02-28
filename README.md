@@ -72,8 +72,11 @@ Claude Code saves session transcripts in `~/.claude/projects/`. Subagent session
 |------|----------------|
 | **cc-agent-load** | How much is YOU vs. AI? |
 | [cc-session-stats](https://github.com/yurukusa/cc-session-stats) | Total usage stats |
+| [cc-ghost-log](https://github.com/yurukusa/cc-ghost-log) | Git commits from Ghost Days |
 | [cc-personality](https://github.com/yurukusa/cc-personality) | What kind of developer are you? |
 | [cc-wrapped](https://yurukusa.github.io/cc-wrapped/) | Your AI year in review |
+
+All tools: [cc-toolkit](https://yurukusa.github.io/cc-toolkit/)
 
 ## License
 
