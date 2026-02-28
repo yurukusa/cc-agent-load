@@ -76,11 +76,16 @@ async function addSession(filePath, project, bucket) {
     if (start && end) {
       const durationMs = end - start;
       if (durationMs >= 0 && durationMs < 7 * 24 * 60 * 60 * 1000) {
-        bucket.hours += durationMs / (1000 * 60 * 60);
+        const h = durationMs / (1000 * 60 * 60);
+        bucket.hours += h;
         bucket.count++;
         // Track by project
         if (!bucket.byProject[project]) bucket.byProject[project] = 0;
-        bucket.byProject[project] += durationMs / (1000 * 60 * 60);
+        bucket.byProject[project] += h;
+        // Track by date (for Ghost Days)
+        const day = start.toLocaleDateString('en-CA'); // YYYY-MM-DD
+        if (!bucket.byDate[day]) bucket.byDate[day] = 0;
+        bucket.byDate[day] += h;
       }
     }
   } catch {}
@@ -90,8 +95,8 @@ async function scan() {
   const claudeDir = join(homedir(), '.claude');
   const projectsDir = join(claudeDir, 'projects');
 
-  const main = { hours: 0, count: 0, byProject: {} };
-  const sub = { hours: 0, count: 0, byProject: {} };
+  const main = { hours: 0, count: 0, byProject: {}, byDate: {} };
+  const sub = { hours: 0, count: 0, byProject: {}, byDate: {} };
 
   let projectDirs;
   try {
@@ -136,6 +141,18 @@ if (!jsonMode) process.stdout.write(`  ${C.dim}Analyzing...${C.reset}\r`);
 
 const { main, sub } = await scan();
 
+// Ghost Days: dates where AI worked but you didn't
+const allDates = new Set([...Object.keys(main.byDate), ...Object.keys(sub.byDate)]);
+const ghostDaysList = [];
+for (const date of allDates) {
+  const mainH = main.byDate[date] || 0;
+  const subH = sub.byDate[date] || 0;
+  if (mainH === 0 && subH > 0) ghostDaysList.push({ date, hours: subH });
+}
+ghostDaysList.sort((a, b) => b.hours - a.hours);
+const ghostHours = ghostDaysList.reduce((s, d) => s + d.hours, 0);
+const longestGhostDay = ghostDaysList[0] || null;
+
 const total = main.hours + sub.hours;
 const mainPct = total > 0 ? main.hours / total : 0;
 const subPct = total > 0 ? sub.hours / total : 0;
@@ -158,7 +175,7 @@ const topProjects = Object.entries(allProjects)
 
 if (jsonMode) {
   console.log(JSON.stringify({
-    version: '1.0',
+    version: '1.1',
     totalHours: total,
     mainHours: main.hours,
     subagentHours: sub.hours,
@@ -168,6 +185,9 @@ if (jsonMode) {
     mainPct: Math.round(mainPct * 100),
     subPct: Math.round(subPct * 100),
     topProjects,
+    ghostDays: ghostDaysList.length,
+    ghostHours: Math.round(ghostHours * 10) / 10,
+    longestGhostDay: longestGhostDay ? { date: longestGhostDay.date, hours: Math.round(longestGhostDay.hours * 10) / 10 } : null,
   }, null, 2));
   process.exit(0);
 }
@@ -208,6 +228,26 @@ if (topProjects.length > 0) {
     const subBar = '█'.repeat(Math.round(subRatio * 12));
     const mainBar = '░'.repeat(12 - Math.round(subRatio * 12));
     console.log(`  ${C.dim}${name}${C.reset}  ${C.yellow}${subBar}${C.dim}${mainBar}${C.reset}  ${p.total.toFixed(1)}h total`);
+  }
+}
+
+if (ghostDaysList.length > 0) {
+  console.log();
+  console.log(`  ${C.bold}▸ Ghost Days${C.reset}  ${C.dim}(AI worked, you didn't)${C.reset}`);
+  console.log();
+  console.log(`  ${C.yellow}${ghostDaysList.length} days${C.reset}  AI ran without you  —  ${C.yellow}${ghostHours.toFixed(1)}h total${C.reset}`);
+  if (longestGhostDay) {
+    console.log(`  ${C.dim}Longest: ${longestGhostDay.date} (${longestGhostDay.hours.toFixed(1)}h)${C.reset}`);
+  }
+  if (ghostDaysList.length <= 5) {
+    for (const d of ghostDaysList) {
+      console.log(`  ${C.dim}  ${d.date}  ${d.hours.toFixed(1)}h${C.reset}`);
+    }
+  } else {
+    for (const d of ghostDaysList.slice(0, 3)) {
+      console.log(`  ${C.dim}  ${d.date}  ${d.hours.toFixed(1)}h${C.reset}`);
+    }
+    console.log(`  ${C.dim}  ... and ${ghostDaysList.length - 3} more${C.reset}`);
   }
 }
 

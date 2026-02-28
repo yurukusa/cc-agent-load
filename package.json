@@ -1,6 +1,6 @@
 {
   "name": "cc-agent-load",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "See how much of your Claude Code time is YOU vs AI autonomous subagents.",
   "bin": {
     "cc-agent-load": "cli.mjs"
