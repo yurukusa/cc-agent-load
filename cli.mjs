@@ -271,3 +271,8 @@ console.log(`  ${C.dim}── Share ──${C.reset}`);
 console.log(`  ${C.dim}My Claude Code AI load: ${Math.round(subPct * 100)}% subagent / ${Math.round(mainPct * 100)}% me — ${autonomyRatio.toFixed(1)}x autonomy ratio${C.reset}`);
 console.log(`  ${C.dim}npx cc-agent-load  #ClaudeCode #AIAutonomy${C.reset}`);
 console.log();
+
+console.log(`  ${C.dim}Running Claude Code autonomously? Check your safety score:${C.reset}`);
+console.log(`  ${C.dim}npx cc-health-check${C.reset}`);
+console.log(`  ${C.dim}Full production kit: https://yurukusa.gumroad.com/l/pkbbl?utm_source=npm&utm_medium=cli&utm_campaign=ops-kit${C.reset}`);
+console.log();
