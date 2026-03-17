@@ -80,6 +80,10 @@ Claude Code saves session transcripts in `~/.claude/projects/`. Subagent session
 
 All tools: [cc-toolkit](https://yurukusa.github.io/cc-toolkit/)
 
+### Running AI autonomously? Keep it safe.
+
+**[Claude Code Ops Kit](https://yurukusa.github.io/cc-ops-kit-landing/?utm_source=github&utm_medium=readme&utm_campaign=cc-agent-load)** ($19) — 10 production hooks + 6 templates + 3 tools. Built from 140+ hours of autonomous operation.
+
 ## License
 
 MIT
