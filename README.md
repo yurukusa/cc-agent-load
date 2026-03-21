@@ -82,7 +82,7 @@ All tools: [cc-toolkit](https://yurukusa.github.io/cc-toolkit/)
 
 ### Running AI autonomously? Keep it safe.
 
-**Quick safety setup:** `npx cc-safe-setup` — 7 hooks in 10 seconds (free). [GitHub](https://github.com/yurukusa/cc-safe-setup)
+**Quick safety setup:** `npx cc-safe-setup` — 8 hooks in 10 seconds (free). [GitHub](https://github.com/yurukusa/cc-safe-setup)
 
 **[Claude Code Ops Kit](https://yurukusa.github.io/cc-ops-kit-landing/?utm_source=github&utm_medium=readme&utm_campaign=cc-agent-load)** — 16 production hooks + 5 templates + 3 tools. Built from 160+ hours of autonomous operation.
 
